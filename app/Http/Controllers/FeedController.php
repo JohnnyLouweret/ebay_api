@@ -31,14 +31,12 @@ class FeedController extends BaseController
     }
 
     /**
-     * @throws UnknownPropertyException
+     * @param Request $request
      */
     public function index(Request $request)
     {
         $productResponse = $this->apiConnection->getProduct(
             ProductApiRequest::createFromQueryCollection($request->collect())
         );
-
-        dd($productResponse);
     }
 }
