@@ -4,6 +4,7 @@ namespace App\Objects\ApiRequest;
 
 use App\Objects\ApiHeaders\ApiHeaderInterface;
 use App\Objects\ApiQuery\ApiQueryInterface;
+use App\Objects\ApiQuery\Query;
 
 abstract class ApiRequest
 {
@@ -27,9 +28,9 @@ abstract class ApiRequest
     }
 
     /**
-     * @return ApiQueryInterface
+     * @return Query
      */
-    public function getQuery(): ApiQueryInterface
+    public function getQuery(): Query
     {
         return $this->query;
     }

@@ -4,7 +4,7 @@ namespace App\ApiConnections\Interfaces;
 
 use App\Objects\ApiRequest\ProductApiRequest;
 
-interface ApiProductInterface
+interface ApiProduct
 {
     /**
      * @param ProductApiRequest $productApiRequest

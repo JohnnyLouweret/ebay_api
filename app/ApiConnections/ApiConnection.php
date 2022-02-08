@@ -30,6 +30,6 @@ abstract class ApiConnection
     protected function get(ApiRequest $apiRequest): Response
     {
         return Http::withHeaders($apiRequest->getHeader()->toArray())
-            ->get($this->provider->getSelfExternalUrl(), $apiRequest->getQuery()->toArray());
+            ->get($this->provider->getSelfExternalUrl(), $apiRequest->getQuery()->toQueryString());
     }
 }
