@@ -2,41 +2,53 @@
 
 namespace App\Http\Controllers;
 
-use App\ApiConnections\ApiConnection;
-use App\ApiConnections\Factory\ApiConnectionFactory;
-use App\Exceptions\UnknownPropertyException;
-use App\Exceptions\UnsupportedProviderException;
-use App\Objects\ApiRequest\ProductApiRequest;
-use App\Objects\Enum\ProvidersEnum;
+use App\Objects\ApiQuery\ProductQuery;
+use App\Service\FeedProvider;
+use Exception;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller as BaseController;
 
 class FeedController extends BaseController
 {
     /**
-     * @var ApiConnection
+     * @var FeedProvider
      */
-    private $apiConnection;
+    private $feedProvider;
 
     /**
-     * @param ApiConnectionFactory $apiConnectionFactory
+     * @param FeedProvider $feedProvider
      *
-     * @throws UnsupportedProviderException
      */
-    public function __construct(ApiConnectionFactory $apiConnectionFactory)
+    public function __construct(FeedProvider $feedProvider)
     {
-        $this->apiConnection = $apiConnectionFactory::createForProvider(
-            ProvidersEnum::createEbay()
-        );
+        $this->feedProvider = $feedProvider;
     }
 
     /**
      * @param Request $request
+     *
+     * @return JsonResponse
+     * @throws Exception
      */
-    public function index(Request $request)
+    public function index(Request $request): JsonResponse
     {
-        $productResponse = $this->apiConnection->getProduct(
-            ProductApiRequest::createFromQueryCollection($request->collect())
+        if (false === $request->has('keywords')) {
+            return response()->json(['error' => 'Bad request'], 400);
+        }
+
+        $apiOperation = $this->feedProvider->getProductByKeyWords(
+            ProductQuery::createFromQuery($request->query())
         );
+
+        if ($apiOperation->succeeded()) {
+            return response()->json([
+                'data' => $apiOperation->getProducts()->toArray()
+            ]);
+        }
+
+        return response()->json([
+            'error' => $apiOperation->getError()
+        ]);
     }
 }
