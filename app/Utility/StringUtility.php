@@ -23,4 +23,20 @@ class StringUtility
     {
         return lcfirst(str_replace(' ', '', ucwords(str_replace('_', ' ', $input))));
     }
+
+    /**
+     * @param string $json
+     *
+     * @return array
+     */
+    public static function jsonToArray(string $json): array
+    {
+        $array = json_decode($json,true);
+
+        if (is_array($array)) {
+            return $array;
+        }
+
+        return [];
+    }
 }

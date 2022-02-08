@@ -2,55 +2,62 @@
 
 namespace App\Objects\ApiQuery;
 
-use App\Objects\Enum\QueryParametersEnum;
-use App\Utility\ArrayUtility;
-use App\Utility\StringUtility;
-use Illuminate\Support\Collection;
+use App\Collection\ItemFilterCollection;
+use App\Objects\Enum\ItemFilterEnum;
+use App\Objects\Enum\SortOrderEnum;
+use App\Objects\ItemFilter;
+use App\Objects\SortOrder;
+use App\Utility\ItemFilterUtility;
+use Exception;
 
-class ProductQuery implements ApiQueryInterface
+class ProductQuery extends Query
 {
+    const KEYWORDS = 'keywords';
+    const SORT = 'sorting';
+
     /**
-     * @var string
+     * @var string|null
      */
     private $keywords;
 
     /**
-     * @var int
+     * @var ItemFilterCollection
      */
-    private $priceMin;
+    private $itemFilters;
 
     /**
-     * @var int
+     * @var SortOrder
      */
-    private $priceMax;
+    private $sortOrder;
+
+    private function __construct()
+    {
+        $this->itemFilters = new ItemFilterCollection();
+    }
 
     /**
-     * @var
-     */
-    private $sorting;
-
-    /**
-     * @param Collection $collection
+     * @param array $query
      *
      * @return ProductQuery
+     * @throws Exception
      */
-    public static function createFromCollection(Collection $collection): ProductQuery
+    public static function createFromQuery(array $query): ProductQuery
     {
-        $query = new self();
+        $productQuery = new self();
 
-        foreach ($collection->toArray() as $key => $value) {
+        foreach ($query as $key => $value) {
+            if ($key === self::KEYWORDS) {
+                $productQuery->keywords = $value;
 
-            if (ArrayUtility::inArrayAndNotEmptyString(QueryParametersEnum::getOptions(), $key)) {
+            } else if (ItemFilterEnum::isValidOption($key)) {
+                $productQuery->itemFilters->add(ItemFilter::create(new ItemFilterEnum($key), $value));
 
-                $camelProperty = StringUtility::snakeToCamel($key);
-
-                if (property_exists($query, $camelProperty)) {
-                    $query->{$camelProperty} = $value;
-                }
+            } else if ($key === self::SORT && SortOrderEnum::isValidOption($value)) {
+                $productQuery->sortOrder = SortOrder::create(new SortOrderEnum($value));
             }
         }
 
-        return $query;
+        return $productQuery;
     }
 
     /**
@@ -58,15 +65,15 @@ class ProductQuery implements ApiQueryInterface
      */
     public function toArray(): array
     {
-        $array = [];
+        $array = [self::KEYWORDS => $this->keywords];
 
-        foreach (QueryParametersEnum::getOptions() as $key) {
+        foreach ($this->itemFilters->getItems() as $key => $item) {
+            $array[ItemFilterUtility::getName($key)] = $item->getName()->getSelfEbayOption();
+            $array[ItemFilterUtility::getValue($key)] = $item->getValue();
+        }
 
-            $camelProperty = StringUtility::snakeToCamel($key);
-
-            if (property_exists($this, $camelProperty)) {
-                $array[$key] = $this->{$camelProperty};
-            }
+        if ($this->sortOrder instanceof SortOrder) {
+            $array[$this->sortOrder->getName()] = $this->sortOrder->getValue()->getSelfEbayOption();
         }
 
         return $array;
