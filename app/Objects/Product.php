@@ -6,6 +6,18 @@ use App\Objects\Enum\ProvidersEnum;
 
 class Product
 {
+    const ARRAY_KEY_PROVIDER = 'provider';
+    const ARRAY_KEY_ITEM_ID = 'item_id';
+    const ARRAY_KEY_CLICK_OUT_LINK = 'click_out_link';
+    const ARRAY_KEY_PHOTO_URL = 'main_photo_url';
+    const ARRAY_KEY_PRICE = 'price';
+    const ARRAY_KEY_PRICE_CURRENCY = 'price_currency';
+    const ARRAY_KEY_SHIPPING_PRICE = 'shipping_price';
+    const ARRAY_KEY_TITLE = 'title';
+    const ARRAY_KEY_DESCRIPTION = 'description';
+    const ARRAY_KEY_VALID_UNTIL = 'valid_until';
+    const ARRAY_KEY_BRAND = 'brand';
+
     /**
      * @var ProvidersEnum
      */
@@ -70,22 +82,70 @@ class Product
     }
 
     /**
+     * @param ProvidersEnum $provider
+     * @param array         $response
+     *
+     * @return Product
+     */
+    public static function create(ProvidersEnum $provider, array $response): Product
+    {
+        $product = new self($provider);
+
+        if (array_key_exists(self::ARRAY_KEY_ITEM_ID, $response)) {
+            $product->itemId = $response[self::ARRAY_KEY_ITEM_ID];
+        }
+
+        if (array_key_exists(self::ARRAY_KEY_CLICK_OUT_LINK, $response)) {
+            $product->clickOutLink = $response[self::ARRAY_KEY_CLICK_OUT_LINK];
+        }
+
+        if (array_key_exists(self::ARRAY_KEY_PHOTO_URL, $response)) {
+            $product->mainPhotoUrl = $response[self::ARRAY_KEY_PHOTO_URL];
+        }
+
+            if (array_key_exists(self::ARRAY_KEY_PRICE, $response)) {
+                $product->price = $response[self::ARRAY_KEY_PRICE];
+            }
+            if (array_key_exists(self::ARRAY_KEY_PRICE_CURRENCY, $response)) {
+                $product->priceCurrency = $response[self::ARRAY_KEY_PRICE_CURRENCY];
+            }
+
+        if (array_key_exists(self::ARRAY_KEY_SHIPPING_PRICE, $response)) {
+            $product->shippingPrice = $response[self::ARRAY_KEY_SHIPPING_PRICE];
+        }
+
+        if (array_key_exists(self::ARRAY_KEY_TITLE, $response)) {
+            $product->title = $response[self::ARRAY_KEY_TITLE];
+        }
+
+        if (array_key_exists(self::ARRAY_KEY_DESCRIPTION, $response)) {
+            $product->description = $response[self::ARRAY_KEY_DESCRIPTION];
+        }
+
+        if (array_key_exists(self::ARRAY_KEY_BRAND, $response)) {
+            $product->brand = $response[self::ARRAY_KEY_BRAND];
+        }
+
+        return $product;
+    }
+
+    /**
      * @return array
      */
     public function toArray(): array
     {
         return [
-            'provider' => $this->provider->getValue(),
-            'item_id' => $this->itemId,
-            'click_out_link' => $this->clickOutLink,
-            'main_photo_url' => $this->mainPhotoUrl,
-            'price' => $this->price,
-            'price_currency' => $this->priceCurrency,
-            'shipping_price' => $this->shippingPrice,
-            'title' => $this->title,
-            'description' => $this->description,
-            'valid_until' => $this->validUntil,
-            'brand' => $this->brand
+            self::ARRAY_KEY_PROVIDER => $this->provider->getValue(),
+            self::ARRAY_KEY_ITEM_ID => $this->itemId,
+            self::ARRAY_KEY_CLICK_OUT_LINK => $this->clickOutLink,
+            self::ARRAY_KEY_PHOTO_URL => $this->mainPhotoUrl,
+            self::ARRAY_KEY_PRICE => $this->price,
+            self::ARRAY_KEY_PRICE_CURRENCY => $this->priceCurrency,
+            self::ARRAY_KEY_SHIPPING_PRICE => $this->shippingPrice,
+            self::ARRAY_KEY_TITLE => $this->title,
+            self::ARRAY_KEY_DESCRIPTION => $this->description,
+            self::ARRAY_KEY_VALID_UNTIL => $this->validUntil,
+            self::ARRAY_KEY_BRAND => $this->brand
         ];
     }
 }

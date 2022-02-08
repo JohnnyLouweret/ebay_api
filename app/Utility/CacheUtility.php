@@ -17,9 +17,9 @@ class CacheUtility
      */
     public static function retrieveProducts(ProductQuery $queryString): ProductCollection
     {
-        $products = Cache::get($queryString->toQueryString());
+        $products = StringUtility::jsonToArray(Cache::get($queryString->toQueryString()));
 
-        return ProductCollection::createFromArray($products);
+        return ProductCollection::createFromCache($products);
     }
 
     /**
@@ -30,6 +30,6 @@ class CacheUtility
      */
     public static function storeProducts(string $key, ProductCollection $items): void
     {
-        Cache::put($key, $items->toArray(), self::EXPIRATION);
+        Cache::put($key, json_encode($items->toArray()), self::EXPIRATION);
     }
 }

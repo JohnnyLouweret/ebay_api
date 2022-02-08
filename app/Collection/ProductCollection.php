@@ -30,12 +30,28 @@ class ProductCollection
      *
      * @return ProductCollection
      */
-    public static function createFromArray(array $products): ProductCollection
+    public static function createFromEbayResponse(array $products): ProductCollection
     {
         $collection = new self();
 
         foreach ($products as $product) {
             $collection->add(EbayParser::createProductFromEbayResponse($product));
+        }
+
+        return $collection;
+    }
+
+    /**
+     * @param array $products
+     *
+     * @return ProductCollection
+     */
+    public static function createFromCache(array $products): ProductCollection
+    {
+        $collection = new self();
+
+        foreach ($products as $product) {
+            $collection->add(EbayParser::createProductFromCache($product));
         }
 
         return $collection;

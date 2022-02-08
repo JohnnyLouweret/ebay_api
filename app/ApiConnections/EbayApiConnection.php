@@ -39,7 +39,7 @@ class EbayApiConnection extends ApiConnection implements ApiProduct
 
             if (EbayStatusEnum::STATUS_SUCCESS === EbayParser::getStatusFromResult($responseArray)) {
                 $items = EbayParser::getProductsFromResult($responseArray);
-                $operation->setProducts(ProductCollection::createFromArray($items));
+                $operation->setProducts(ProductCollection::createFromEbayResponse($items));
 
             } else {
                 $operation->setError(EbayParser::getErrorMessageFromResult($responseArray));

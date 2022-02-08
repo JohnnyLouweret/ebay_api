@@ -150,4 +150,12 @@ class EbayParser
 
         return $product;
     }
+
+    /**
+     * @param $product
+     */
+    public static function createProductFromCache($product)
+    {
+        return Product::create(ProvidersEnum::createEbay(), $product);
+    }
 }
